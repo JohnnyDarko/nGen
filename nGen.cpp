@@ -20,12 +20,12 @@
 //#include <nEuron.h>
 
 // Agent libraries
-#include <agents/Platform.h>
-#include <agents/Control.h>
-#include <agents/AutoPilot.h>
-#include <agents/Guidance.h>
-#include <agents/Navigation.h>
-#include <agents/Payload.h>
+//#include "Platform.h"
+//#include "Control.h"
+//#include "AutoPilot.h"
+//#include "Guidance.h"
+#include "Navigation.h"
+//#include "Payload.h"
 
 
 /** Interval constants - Develop Frequency.
