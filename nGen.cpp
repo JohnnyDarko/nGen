@@ -1,31 +1,14 @@
 // This code is under MIT licence
 // you can find the complete file in project-root / LICENSE.txt
 
-// sudo valgrind  --track-origins=yes --tool=memcheck --leak-check=full --show-reachable=yes ./nGen
-//sudo valgrind  --track-origins=yes --tool=memcheck --leak-check=full --show-reachable=yes --num-callers=20 --track-fds=yes --dsymutil=yes --ignore-range-below-sp=1024-1 --vgdb=yes --vgdb-error=0 ./nGen
-//sudo gdbserver localhost:2001 ./nGen
-//ddd --debugger "/usr/local/bin/arm-linux-gnueabihf-gdb" --eval-command="target remote SCOUT-06:2001"
-
-
-// Dependencies
 #include <iostream>
 #include <pthread.h>
 #include <sched.h>
 #include <time.h>
 #include <unistd.h>
 
-
-
-// zero-mq based communication library
-//#include <nEuron.h>
-
-// Agent libraries
-//#include "Platform.h"
-//#include "Control.h"
-//#include "AutoPilot.h"
-//#include "Guidance.h"
 #include "Navigation.h"
-//#include "Payload.h"
+
 
 
 /** Interval constants - Develop Frequency.
@@ -65,19 +48,12 @@ const int PRIORITY_3    = 80;
 const int PRIORITY_4    = 75;
 const int PRIORITY_5    = 70;
 
-
-
 // instantiation of agents
-//Platform*   agnt_Platform = new Platform();
-//Control*    agnt_Control = new Control();
-//AutoPilot*  agnt_AutoPilot = new AutoPilot();
-//Guidance*   agnt_Guidance = new Guidance();
 Navigation* agnt_Navigation = new Navigation();
-//Payload*    agnt_Payload_1 = new Payload();
 
 // Prototypes for operational funtions
 void dispatch_agents();
-int build_and_depoly_thread(int, void* (*)(void*));
+int deploy_agent_thread(int, void* (*)(void*));
 //void* dispatch_400hz(void*);
 //void* dispatch_200hz(void*);
 //void* dispatch_100hz(void*);
@@ -89,16 +65,12 @@ void* dispatch_5hz(void*);
 
 int main()
 {
-//    // for nanosleep parameters
-//    struct timespec tim = {0};
-//    tim.tv_sec = 1;
-//    tim.tv_nsec = 0;
-//    
+ 
     dispatch_agents();
 
     while(1)
     {
-        sleep(1);//nanosleep(&tim, (struct timespec *)NULL);
+        sleep(1);
     }
 
     return 0;
@@ -109,18 +81,20 @@ int main()
 void dispatch_agents()
 {
     // (thread rt-priority, function to run in thread)
-    //ret = build_and_depoly_thread(C_priority_1, dispatch_400hz);
-    //ret = build_and_depoly_thread(C_priority_2, dispatch_200hz);
-    //ret = build_and_depoly_thread(C_priority_3, dispatch_100hz);
-    //build_and_depoly_thread(C_priority_4, dispatch_50hz);
-    //ret = build_and_depoly_thread(C_priority_5, dispatch_10hz);
-    build_and_depoly_thread(PRIORITY_3, dispatch_5hz);
-    //ret = build_and_depoly_thread(C_priority_5, dispatch_1hz);
-    
+    //deploy_agent_thread(C_priority_1, dispatch_400hz);
+    //deploy_agent_thread(C_priority_2, dispatch_200hz);
+    //deploy_agent_thread(C_priority_3, dispatch_100hz);
+    //deploy_agent_thread(C_priority_4, dispatch_50hz);
+    //deploy_agent_thread(C_priority_5, dispatch_10hz);
+    deploy_agent_thread(PRIORITY_3, dispatch_5hz);
+    //deploy_agent_thread(C_priority_5, dispatch_1hz);
 
 }
 
-int build_and_depoly_thread(int prio, void* (*thread_func)(void* arg))
+//TODO: bring this altogether to allow easy configuration of schedule
+//      automate it a bit to reduce code.
+
+int deploy_agent_thread(int prio, void* (*thread_func)(void* arg))
 {
     // prioritize and launch dispatcher in "loaded" state
     int retval = 0;
